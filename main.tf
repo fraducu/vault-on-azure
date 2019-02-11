@@ -33,7 +33,7 @@ data "azurerm_virtual_network" "vault-demo-network" {
 
 data "azurerm_subnet" "manag" {
   name                 = "Management"
-  virtual_network_name = "${data.azurerm_virtual_network.my_virt_net.name}"
+  virtual_network_name = "${data.azurerm_virtual_network.vault-demo-network.name}"
   resource_group_name  = "${data.azurerm_resource_group.res_group_netw.name}"
 } 
 
