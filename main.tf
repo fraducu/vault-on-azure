@@ -1,5 +1,6 @@
-provider "azurerm" {
-}
+ terraform {
+   backend "azurerm" {}
+ }
 
 resource "azurerm_resource_group" "default" {
   name     = "${var.resource_group_name}"
@@ -7,33 +8,51 @@ resource "azurerm_resource_group" "default" {
 
   tags {
     environment = "dev"
+    purpose = "CI/CD"
   }
 }
 
-module "network" "vault-demo-network" {
-  source              = "github.com/nicholasjackson/terraform-azurerm-network"
-  location            = "${var.location}"
-  resource_group_name = "${azurerm_resource_group.default.name}"
-  subnet_prefixes     = "${var.subnet_prefixes}"
-  subnet_names        = "${var.subnet_names}"
-  vnet_name           = "tfaz-vnet"
-  sg_name             = "${var.sg_name}"
+data "azurerm_resource_group" "res_group_netw" {
+  name = "openshift"
 }
 
-resource "azurerm_public_ip" "vault-demo" {
-  name                         = "vault-demo-public-ip"
-  location                     = "${var.location}"
-  resource_group_name          = "${azurerm_resource_group.default.name}"
-  public_ip_address_allocation = "static"
-  domain_name_label            = "${var.resource_group_name}-ssh"
+# module "network" "vault-demo-network" {
+#   source              = "github.com/nicholasjackson/terraform-azurerm-network"
+#   location            = "${var.location}"
+#   resource_group_name = "${azurerm_resource_group.default.name}"
+#   subnet_prefixes     = "${var.subnet_prefixes}"
+#   subnet_names        = "${var.subnet_names}"
+#   vnet_name           = "tfaz-vnet"
+#   sg_name             = "${var.sg_name}"
+# }
 
-  tags {
-    environment = "dev"
-  }
+data "azurerm_virtual_network" "vault-demo-network" {
+  name                = "k8s-vNet01"
+  resource_group_name = "${data.azurerm_resource_group.res_group_netw.name}"
 }
+
+data "azurerm_subnet" "manag" {
+  name                 = "Management"
+  virtual_network_name = "${data.azurerm_virtual_network.my_virt_net.name}"
+  resource_group_name  = "${data.azurerm_resource_group.res_group_netw.name}"
+} 
+
+# resource "azurerm_public_ip" "vault-demo" {
+#   name                         = "vault-demo-public-ip"
+#   location                     = "${var.location}"
+#   resource_group_name          = "${azurerm_resource_group.default.name}"
+#   public_ip_address_allocation = "static"
+#   domain_name_label            = "${var.resource_group_name}-ssh"
+
+#   tags {
+#     environment = "dev"
+#   }
+# }
+
+
 
 resource "azurerm_network_security_group" "vault-demo" {
-  name                = "vault-demo-ssh-access"
+  name                = "${var.sg_name}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.default.name}"
 }
@@ -63,20 +82,20 @@ resource "azurerm_network_security_rule" "ssh_access_vault_demo" {
   destination_port_range      = "22"
   protocol                    = "Tcp"
   resource_group_name         = "${azurerm_resource_group.default.name}"
-  network_security_group_name = "${module.network.security_group_name}"
+  network_security_group_name = "${var.sg_name}"
 }
 
 resource "azurerm_network_interface" "vault-demo" {
-  name                      = "vault-demo-nic"
+  name                      = "vault-demo-nic-0"
   location                  = "${var.location}"
   resource_group_name       = "${azurerm_resource_group.default.name}"
   network_security_group_id = "${azurerm_network_security_group.vault-demo.id}"
 
   ip_configuration {
     name                          = "IPConfiguration"
-    subnet_id                     = "${module.network.vnet_subnets[0]}"
+    subnet_id                     = "${data.azurerm_subnet.manag.id}"
     private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = "${azurerm_public_ip.vault-demo.id}"
+    # public_ip_address_id          = "${azurerm_public_ip.vault-demo.id}"
   }
 
   tags {
@@ -107,8 +126,9 @@ resource "azurerm_virtual_machine" "vault-demo" {
   location                      = "${var.location}"
   resource_group_name           = "${azurerm_resource_group.default.name}"
   network_interface_ids         = ["${azurerm_network_interface.vault-demo.id}"]
-  vm_size                       = "Standard_DS1_v2"
+  vm_size                       = "Standard_B1ms"
   delete_os_disk_on_termination = true
+  delete_data_disks_on_termination = true
 
   storage_image_reference {
     publisher = "Canonical"
@@ -126,7 +146,7 @@ resource "azurerm_virtual_machine" "vault-demo" {
 
   os_profile {
     computer_name  = "vault-demo"
-    admin_username = "azureuser"
+    admin_username = "${var.vm_admin}"
     admin_password = "Password1234!"
   }
 
@@ -134,8 +154,8 @@ resource "azurerm_virtual_machine" "vault-demo" {
     disable_password_authentication = true
 
     ssh_keys {
-      path     = "/home/azureuser/.ssh/authorized_keys"
-      key_data = "${trimspace(tls_private_key.key.public_key_openssh)} user@vaultdemo.io"
+      path     = "/home/${var.vm_admin}/.ssh/authorized_keys"
+      key_data = "${trimspace(tls_private_key.key.public_key_openssh)} ${var.vm_admin}@vaultdemo.io"
     }
   }
 
@@ -145,6 +165,7 @@ resource "azurerm_virtual_machine" "vault-demo" {
 
   tags {
     environment = "dev"
+    purpose = "CI/CD"
   }
 }
 

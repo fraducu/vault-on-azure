@@ -1,6 +1,10 @@
 # Terraform related
 .terraform
+*.tfstate
 terraform.tfstate*
+
+# .tfvars files
+*.tfvars
 
 # Temporary SSH keys
 .ssh/
