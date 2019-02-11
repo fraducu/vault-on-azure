@@ -1,5 +1,5 @@
  terraform {
-   backend ="${terraform_remote_state.azurerm_remote_state}" 
+   backend "azurerm" {}
  }
 
 resource "azurerm_resource_group" "default" {
