@@ -188,12 +188,12 @@ resource "azurerm_virtual_machine_extension" "vault-demo" {
 SETTINGS
 }
 
-# Gets the current subscription id
-data "azurerm_subscription" "primary" {}
+# # Gets the current subscription id
+# data "azurerm_subscription" "primary" {}
 
-resource "azurerm_role_assignment" "vault-demo" {
-  scope                = "${data.azurerm_subscription.primary.id}"
-  role_definition_name = "Reader"
-  principal_id         = "${lookup(azurerm_virtual_machine.vault-demo.identity[0], "principal_id")}"
-}
+# resource "azurerm_role_assignment" "vault-demo" {
+#   scope                = "${data.azurerm_subscription.primary.id}"
+#   role_definition_name = "Reader"
+#   principal_id         = "${lookup(azurerm_virtual_machine.vault-demo.identity[0], "principal_id")}"
+# }
 
