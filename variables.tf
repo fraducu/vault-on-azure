@@ -5,6 +5,11 @@ variable "AZURE_CLIENT_ID" {}
 variable "AZURE_CLIENT_SECRET" {}
 variable "AZURE_TENANT_ID" {} 
 
+variable "terraform_state_resource_group_name" {}
+variable "terraform_state_storage_account_name" {}
+variable "terraform_state_container_name" {}
+variable "terraform_state_access_key" {}
+
 variable "location" {
   default = "NorthEurope"
 }
