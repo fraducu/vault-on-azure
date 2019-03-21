@@ -121,6 +121,10 @@ EOF
   }
 }
 
+data "template_file" "setup" {
+  template = "${file("${path.module}/setup.tpl")}"
+}
+
 resource "azurerm_virtual_machine" "vault-demo" {
   name                          = "vault-demo"
   location                      = "${var.location}"
@@ -148,6 +152,7 @@ resource "azurerm_virtual_machine" "vault-demo" {
     computer_name  = "vault-demo"
     admin_username = "${var.vm_admin}"
     admin_password = "Password1234!"
+    custom_data = "${data.template_file.setup.rendered}"
   }
 
   os_profile_linux_config {
@@ -169,14 +174,16 @@ resource "azurerm_virtual_machine" "vault-demo" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "vault-demo" {
-  name                  = "vault-demo-extension"
-  location              = "${var.location}"
-  resource_group_name   = "${azurerm_resource_group.default.name}"
-  virtual_machine_name  = "${azurerm_virtual_machine.vault-demo.name}"
-  publisher             = "Microsoft.OSTCExtensions"
-  type                  = "CustomScriptForLinux"
-  type_handler_version  = "1.2"
+# resource "azurerm_virtual_machine_extension" "vault-demo" {
+#   name                  = "vault-demo-extension"
+#   location              = "${var.location}"
+#   resource_group_name   = "${azurerm_resource_group.default.name}"
+#   virtual_machine_name  = "${azurerm_virtual_machine.vault-demo.name}"
+#   publisher             = "Microsoft.OSTCExtensions"
+#   type                  = "CustomScriptForLinux"
+#   type_handler_version  = "1.2"
+
+
 
 #   settings             = <<SETTINGS
 #     {
@@ -186,7 +193,7 @@ resource "azurerm_virtual_machine_extension" "vault-demo" {
 #        ]
 #     }
 # SETTINGS
-}
+# }
 
 # # Gets the current subscription id
 # data "azurerm_subscription" "primary" {}
