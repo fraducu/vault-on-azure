@@ -52,8 +52,7 @@ data "azurerm_subnet" "manag" {
 
 
 resource "azurerm_network_security_group" "vault-demo" {
-  count               = "${var.vm_count}"
-  name                = "${var.sg_name}-${count.index}"
+  name                = "${var.sg_name}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.default.name}"
 }
