@@ -52,6 +52,7 @@ data "azurerm_subnet" "manag" {
 
 
 resource "azurerm_network_security_group" "vault-demo" {
+  count               = "${var.vm_count}"
   name                = "${var.sg_name}-${count.index}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.default.name}"
@@ -86,6 +87,7 @@ resource "azurerm_network_security_rule" "http_access_vault_demo" {
 }
 
 resource "azurerm_network_interface" "vault-demo" {
+  count                     = "${var.vm_count}"
   name                      = "vault-demo-nic-${count.index}"
   location                  = "${var.location}"
   resource_group_name       = "${azurerm_resource_group.default.name}"
@@ -129,6 +131,7 @@ data "template_file" "setup" {
 }
 
 resource "azurerm_virtual_machine" "vault-demo" {
+  count                         = "${var.vm_count}"
   name                          = "vault-demo-${count.index}"
   location                      = "${var.location}"
   resource_group_name           = "${azurerm_resource_group.default.name}"

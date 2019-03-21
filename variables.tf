@@ -14,6 +14,10 @@ variable "resource_group_name" {
   default = "vault"
 }
 
+variable "vm_count" {
+  default = 1
+}
+
 variable "sg_name" {
   description = "security group name"
   default = "cicdvault-nsg"
