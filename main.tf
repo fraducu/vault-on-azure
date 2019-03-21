@@ -178,14 +178,14 @@ resource "azurerm_virtual_machine_extension" "vault-demo" {
   type                  = "CustomScriptForLinux"
   type_handler_version  = "1.2"
 
-  settings             = <<SETTINGS
-    {
-      "commandToExecute": "${var.cmd_extension}",
-       "fileUris": [
-        "${var.cmd_script}"
-       ]
-    }
-SETTINGS
+#   settings             = <<SETTINGS
+#     {
+#       "commandToExecute": "${var.cmd_extension}",
+#        "fileUris": [
+#         "${var.cmd_script}"
+#        ]
+#     }
+# SETTINGS
 }
 
 # # Gets the current subscription id
