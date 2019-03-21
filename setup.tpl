@@ -26,10 +26,6 @@ rm -fr vault_${VAULT_VERSION}_linux_amd64.zip
 echo "-> Checking Vault version"
 vault --version
 
-echo "-> Enable command autocompletion"
-vault -autocomplete-install
-complete -C /usr/local/bin/vault vault
-
 echo "-> Create Vault data directories"
 sudo mkdir /etc/vault
 sudo mkdir -p /var/lib/vault/data
@@ -37,6 +33,10 @@ sudo mkdir -p /var/lib/vault/data
 echo "-> Create user named vault"
 sudo useradd --system --home /etc/vault --shell /bin/false vault
 sudo chown -R vault:vault /etc/vault /var/lib/vault/
+
+echo "-> Enable command autocompletion"
+vault -autocomplete-install
+complete -C /usr/local/bin/vault vault
 
 echo "-> Writing systemd unit....."
 cat <<EOF | sudo tee /etc/systemd/system/vault.service
