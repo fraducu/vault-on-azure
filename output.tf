@@ -5,10 +5,10 @@
 
 output "vault-demo_private_ip" {
   description = "private IP address of the vault-demo server"
-  value       = "${azurerm_network_interface.vault-demo.private_ip_address}"
+  value       = "${azurerm_network_interface.vault-demo.*.private_ip_address}"
 }
 
 output "vault-demo_ssh" {
   description = "shortcut to ssh into the vault demo vm."
-  value = "ssh ${var.vm_admin}@${azurerm_network_interface.vault-demo.private_ip_address} -i ${path.module}/.ssh/id_rsa -L 8200:localhost:8200"
+  value = "ssh ${var.vm_admin}@${azurerm_network_interface.vault-demo.*.private_ip_address} -i ${path.module}/.ssh/id_rsa -L 8200:localhost:8200"
 }
