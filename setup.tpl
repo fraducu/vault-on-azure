@@ -23,9 +23,6 @@ sudo mv vault /usr/local/bin/
 rm -fr vault_${VAULT_VERSION}_linux_amd64.zip
 }
 
-echo "-> Checking Vault version"
-vault --version
-
 echo "-> Create Vault data directories"
 sudo mkdir /etc/vault
 sudo mkdir -p /var/lib/vault/data
@@ -103,3 +100,5 @@ echo "export VAULT_ADDR=http://127.0.0.1:8200" >> ~/.bashrc
 
 sudo rm -rf  /var/lib/vault/data/*
 vault operator init | sudo tee /etc/vault/init.file
+VAULT_TOKEN=$(cat /etc/vault/init.file | grep Root | cut -c 21-)
+export VAULT_TOKEN=$VAULT_TOKEN
