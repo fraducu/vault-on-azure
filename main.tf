@@ -52,7 +52,7 @@ data "azurerm_subnet" "manag" {
 
 
 resource "azurerm_network_security_group" "vault-demo" {
-  name                = "${var.sg_name}"
+  name                = "${var.sg_name}-${count.index}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.default.name}"
 }
@@ -86,7 +86,7 @@ resource "azurerm_network_security_rule" "http_access_vault_demo" {
 }
 
 resource "azurerm_network_interface" "vault-demo" {
-  name                      = "vault-demo-nic-0"
+  name                      = "vault-demo-nic-${count.index}"
   location                  = "${var.location}"
   resource_group_name       = "${azurerm_resource_group.default.name}"
   network_security_group_id = "${azurerm_network_security_group.vault-demo.id}"
@@ -129,7 +129,7 @@ data "template_file" "setup" {
 }
 
 resource "azurerm_virtual_machine" "vault-demo" {
-  name                          = "vault-demo"
+  name                          = "vault-demo-${count.index}"
   location                      = "${var.location}"
   resource_group_name           = "${azurerm_resource_group.default.name}"
   network_interface_ids         = ["${azurerm_network_interface.vault-demo.id}"]
@@ -145,7 +145,7 @@ resource "azurerm_virtual_machine" "vault-demo" {
   }
 
   storage_os_disk {
-    name              = "vault-demo-osdisk"
+    name              = "vault-demo-osdisk-${count.index}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
