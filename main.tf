@@ -71,19 +71,19 @@ resource "azurerm_network_security_rule" "ssh_access" {
   resource_group_name         = "${azurerm_resource_group.default.name}"
 }
 
-# resource "azurerm_network_security_rule" "ssh_access_vault_demo" {
-#   name                        = "allow-vault-demo-ssh"
-#   direction                   = "Inbound"
-#   access                      = "Allow"
-#   priority                    = 210
-#   source_address_prefix       = "*"
-#   source_port_range           = "*"
-#   destination_address_prefix  = "${azurerm_network_interface.vault-demo.private_ip_address}"
-#   destination_port_range      = "22"
-#   protocol                    = "Tcp"
-#   resource_group_name         = "${azurerm_resource_group.default.name}"
-#   network_security_group_name = "${var.sg_name}"
-# }
+resource "azurerm_network_security_rule" "http_access_vault_demo" {
+  name                        = "allow-vault-demo-http"
+  direction                   = "Inbound"
+  access                      = "Allow"
+  priority                    = 210
+  source_address_prefix       = "*"
+  source_port_range           = "*"
+  destination_address_prefix  = "${azurerm_network_interface.vault-demo.private_ip_address}"
+  destination_port_range      = "8200"
+  protocol                    = "Tcp"
+  resource_group_name         = "${azurerm_resource_group.default.name}"
+  network_security_group_name = "${var.sg_name}"
+}
 
 resource "azurerm_network_interface" "vault-demo" {
   name                      = "vault-demo-nic-0"
