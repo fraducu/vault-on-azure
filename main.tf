@@ -123,6 +123,9 @@ EOF
 
 data "template_file" "setup" {
   template = "${file("${path.module}/setup.tpl")}"
+  vars = {
+    VAULT_VERSION = "1.0.3"
+  }
 }
 
 resource "azurerm_virtual_machine" "vault-demo" {

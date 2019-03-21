@@ -16,7 +16,6 @@ sudo apt-get install -y \
   vim
 
 echo "-> Downloading Vault....."
-VAULT_VERSION="1.0.3"
 cd /tmp && {
 curl -sO https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip
 unzip vault_${VAULT_VERSION}_linux_amd64.zip
